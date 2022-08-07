@@ -115,7 +115,7 @@ class App {
 
     static async onServerMessage (message) {
         if (message.devId === env.TUYA_DEVICE_ID) {
-            App.led = LEDStatus.fromJSON(message.status);
+            App.led.merge(message.status);
             App.updateTray();
 
             const win = App.getWindow();

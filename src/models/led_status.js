@@ -8,25 +8,27 @@ class LEDStatus {
     switch_led = false
     colour_data = {}
 
-    constructor(params) {
+    constructor(params = {}) {
         for (let key in params) {
             this[key] = params[key];
         }
     }
 
     static fromJSON(json) {
-        const params = {};
+        return new LEDStatus().merge(json);
+    }
 
+    merge(json) {
         json.forEach(param => {
             if (param.code === LEDCode.SWITCH_LED) {
-                params.switch_led = !!param.value;
+                this.switch_led = !!param.value;
             }
             if (param.code === LEDCode.COLOUR_DATA) {
-                params.colour_data = !!param.value;
+                this.colour_data = param.value;
             }
         });
 
-        return new LEDStatus(params);
+        return this;
     }
 
     isEnabled() {
