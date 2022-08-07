@@ -11,6 +11,8 @@ class ApiClient {
 
     device_id = env.TUYA_DEVICE_ID;
     token = '';
+    refresh_token = '';
+    token_expire = Date.now();
 
     constructor() {
         this.axios = axios.create({
@@ -19,10 +21,43 @@ class ApiClient {
         });
     }
 
-    async loadToken () {
+    async getToken () {
+        if (!this.refresh_token) {
+            const method = 'GET';
+            const timestamp = Date.now().toString();
+            const sign_url = '/v1.0/token?grant_type=1';
+            const content_hash = crypto.createHash('sha256').update('').digest('hex');
+            const string_to_hash = [method, content_hash, '', sign_url].join('\n');
+            const sign_str = ApiClient.client_id + timestamp + string_to_hash;
+    
+            const headers = {
+                t: timestamp,
+                sign_method: 'HMAC-SHA256',
+                client_id: ApiClient.client_id,
+                sign: await this.encryptStr(sign_str, ApiClient.secret_key),
+            };
+            const { data: login } = await this.axios.get(sign_url, { headers });
+    
+            if (!login || !login.success) {
+                throw Error(`Failed to load token: ${login.msg}`);
+            }
+    
+            this.refresh_token = login.result.refresh_token;
+            this.token_expire = Date.now() + (login.result.expire_time * 1000);
+    
+            return this.token = login.result.access_token;
+
+        } else if (Date.now() > this.token_expire - 5000) {
+            return this.refreshToken();
+        } else {
+            return this.token;
+        }
+    }
+
+    async refreshToken () {
         const method = 'GET';
         const timestamp = Date.now().toString();
-        const sign_url = '/v1.0/token?grant_type=1';
+        const sign_url = `/v1.0/token/${this.refresh_token}`;
         const content_hash = crypto.createHash('sha256').update('').digest('hex');
         const string_to_hash = [method, content_hash, '', sign_url].join('\n');
         const sign_str = ApiClient.client_id + timestamp + string_to_hash;
@@ -36,8 +71,11 @@ class ApiClient {
         const { data: login } = await this.axios.get(sign_url, { headers });
 
         if (!login || !login.success) {
-            throw Error(`Failed to load token: ${login.msg}`);
+            throw Error(`Failed to refresh token: ${login.msg}`);
         }
+
+        this.refresh_token = login.result.refresh_token;
+        this.token_expire = Date.now() + (login.result.expire_time * 1000);
 
         return this.token = login.result.access_token;
     }
@@ -56,7 +94,7 @@ class ApiClient {
         query = {},
         body = {},
     ) {
-        await this.loadToken()
+        await this.getToken()
 
         const t = Date.now().toString();
 
@@ -87,8 +125,6 @@ class ApiClient {
     async call (url, method, body = {}, query = {}) {
         const req_headers = await this.getRequestSign(url, method, {}, query, body);
 
-        console.log(JSON.stringify(req_headers, null, 2))
-
         const { data } = await this.axios.request({
             method,
             data: body,
@@ -102,6 +138,13 @@ class ApiClient {
         }
 
         return data;
+    }
+
+    async getLEDStatus () {
+        return await this.call(
+            `/v1.0/devices/${this.device_id}/status`,
+            'GET'
+        )
     }
 
     async switchLED (enabled) {

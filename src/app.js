@@ -49,10 +49,11 @@ class App {
         tray.setToolTip('Tuya LED controller')
         tray.setContextMenu(contextMenu)
 
-        tray.addListener('click', () => {
+        tray.addListener('click', async () => {
             // App.toggleWindow();
 
-            App.api.switchLED(true);
+            await App.api.getLEDStatus();
+            await App.api.switchLED(true);
         });
 
         return tray;
