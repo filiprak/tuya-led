@@ -1,7 +1,7 @@
 {
   "name": "tuya-led",
   "version": "1.0.0",
-  "description": "",
+  "description": "Tuya LED strip device controller",
   "main": "index.js",
   "scripts": {
     "start": "electron-forge start",
@@ -50,14 +50,6 @@
           "platforms": [
             "darwin"
           ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
         }
       ]
     }
