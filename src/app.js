@@ -50,10 +50,7 @@ class App {
         tray.setContextMenu(contextMenu)
 
         tray.addListener('click', async () => {
-            // App.toggleWindow();
-
-            await App.api.getLEDStatus();
-            await App.api.switchLED(true);
+            await App.api.toggleLED();
         });
 
         return tray;

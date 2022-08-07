@@ -2,6 +2,7 @@ const axios = require('axios');
 const crypto = require('crypto');
 const qs = require('qs');
 const env = require('../.env.json');
+const LEDStatus = require('./models/led_status');
 
 
 class ApiClient {
@@ -29,7 +30,7 @@ class ApiClient {
             const content_hash = crypto.createHash('sha256').update('').digest('hex');
             const string_to_hash = [method, content_hash, '', sign_url].join('\n');
             const sign_str = ApiClient.client_id + timestamp + string_to_hash;
-    
+
             const headers = {
                 t: timestamp,
                 sign_method: 'HMAC-SHA256',
@@ -37,14 +38,14 @@ class ApiClient {
                 sign: await this.encryptStr(sign_str, ApiClient.secret_key),
             };
             const { data: login } = await this.axios.get(sign_url, { headers });
-    
+
             if (!login || !login.success) {
                 throw Error(`Failed to load token: ${login.msg}`);
             }
-    
+
             this.refresh_token = login.result.refresh_token;
             this.token_expire = Date.now() + (login.result.expire_time * 1000);
-    
+
             return this.token = login.result.access_token;
 
         } else if (Date.now() > this.token_expire - 5000) {
@@ -147,7 +148,7 @@ class ApiClient {
         )
     }
 
-    async switchLED (enabled) {
+    async switchLED (enable) {
         return await this.call(
             `/v1.0/devices/${this.device_id}/commands`,
             'POST',
@@ -155,11 +156,20 @@ class ApiClient {
                 commands: [
                     {
                         code: 'switch_led',
-                        value: !!enabled,
+                        value: !!enable,
                     }
                 ],
             }
         )
+    }
+
+    async toggleLED (enable) {
+        const { result } = await this.getLEDStatus();
+        const status = LEDStatus.fromJSON(result)
+
+        enable = enable !== undefined ? enable : !status.isEnabled()
+
+        await this.switchLED(enable);
     }
 }
 
