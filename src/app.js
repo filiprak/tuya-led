@@ -1,4 +1,6 @@
 const { app, BrowserWindow, Tray, Menu, screen } = require('electron');
+const env = require('../.env.json');
+const { fork } = require('child_process')
 const ApiClient = require('./api');
 const LEDStatus = require('./models/led_status');
 
@@ -6,9 +8,19 @@ class App {
     static api = new ApiClient();
     static tray = null;
     static led = new LEDStatus();
+    static server = null
 
     static async setup () {
         await app.whenReady()
+
+        App.server = fork(`${__dirname}/../server.js`)
+
+        App.server.on('message', App.onServerMessage);
+
+        process.on('exit', (code) => {
+            console.log('exit')
+            App.server.kill('SIGINT')
+        });
 
         app.on('activate', () => {
             App.toggleWindow(true);
@@ -60,8 +72,6 @@ class App {
 
                 await App.api.toggleLED();
 
-                App.led.setEnabled(!App.led.isEnabled());
-                App.updateTray();
                 App.led.setLoading(false)
             }
         });
@@ -84,6 +94,13 @@ class App {
             BrowserWindow
                 .getAllWindows()
                 .forEach(i => i.close());
+        }
+    }
+
+    static async onServerMessage (message) {
+        if (message.devId === env.TUYA_DEVICE_ID) {
+            App.led = LEDStatus.fromJSON(message.status);
+            App.updateTray();
         }
     }
 }

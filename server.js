@@ -1,8 +1,6 @@
 const env = require('./.env.json')
 const TuyaWebsocket = require('./src/websocket/index')
 
-console.log(TuyaWebsocket.URL.EU)
-
 const client = new TuyaWebsocket({
     accessId: env.TUYA_CLIENT_ID,
     accessKey: env.TUYA_SECRET_KEY,
@@ -17,27 +15,7 @@ client.open(() => {
 
 client.message((ws, message) => {
   client.ackMessage(message.messageId);
-  console.log('message', message);
-});
-
-client.reconnect(() => {
-  console.log('reconnect');
-});
-
-client.ping(() => {
-  console.log('ping');
-});
-
-client.pong(() => {
-  console.log('pong');
-});
-
-client.close((ws, ...args) => {
-  console.log('close', ...args);
-});
-
-client.error((ws, error) => {
-  console.log('error', error);
+  process.send(message.payload.data)
 });
 
 client.start()
