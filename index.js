@@ -2,6 +2,9 @@ const { app, BrowserWindow, Tray, Menu } = require('electron');
 
 
 const createWindow = () => {
+    if (BrowserWindow.getAllWindows().length > 0)
+        return
+
     const win = new BrowserWindow({
         width: 800,
         height: 600
@@ -11,7 +14,6 @@ const createWindow = () => {
 }
 
 app.whenReady().then(() => {
-    // createWindow()
     const tray = new Tray('assets/icons/icon.png')
     const contextMenu = Menu.buildFromTemplate([
         {
@@ -29,15 +31,18 @@ app.whenReady().then(() => {
     ])
     tray.setToolTip('Tuya LED controller')
     tray.setContextMenu(contextMenu)
+    tray.addListener('click', () => {
+        createWindow()
+    });
 
     app.on('activate', () => {
-        // On macOS it's common to re-create a window in the app when the
-        // dock icon is clicked and there are no other windows open.
-        // if (BrowserWindow.getAllWindows().length === 0)
-        //     createWindow()
+        createWindow()
     })
 })
 
 app.on('window-all-closed', () => {
-    app.dock.hide()
+    try {
+        app.dock.hide()
+    } catch (e) {}
+
 })
