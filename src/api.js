@@ -142,10 +142,12 @@ class ApiClient {
     }
 
     async getLEDStatus () {
-        return await this.call(
+        const { result } = await this.call(
             `/v1.0/devices/${this.device_id}/status`,
             'GET'
         )
+
+        return LEDStatus.fromJSON(result);
     }
 
     async switchLED (enable) {
@@ -164,8 +166,7 @@ class ApiClient {
     }
 
     async toggleLED (enable) {
-        const { result } = await this.getLEDStatus();
-        const status = LEDStatus.fromJSON(result)
+        const status = await this.getLEDStatus();
 
         enable = enable !== undefined ? enable : !status.isEnabled()
 

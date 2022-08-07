@@ -3,6 +3,7 @@ class LEDCode {
 }
 
 class LEDStatus {
+    loading = false
     switch_led = false
 
     constructor(params) {
@@ -25,6 +26,18 @@ class LEDStatus {
 
     isEnabled() {
         return this.switch_led
+    }
+
+    setEnabled(enabled) {
+        this.switch_led = !!enabled
+    }
+
+    isLoading() {
+        return this.loading
+    }
+
+    setLoading(loading) {
+        this.loading = !!loading
     }
 }
 
