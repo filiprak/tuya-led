@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, screen } = require('electron');
+const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
 const path = require('path');
 const env = require('../.env.json');
 const { fork } = require('child_process')
@@ -20,12 +20,16 @@ class App {
         await app.whenReady()
 
         App.server = fork(`${__dirname}/../server.js`)
-
         App.server.on('message', App.onServerMessage);
 
         process.on('exit', (code) => {
             App.server.kill('SIGINT')
         });
+
+        ipcMain.on('asynchronous-message', (event, arg) => {
+            App.onFrontendMessage(arg);
+            event.reply('asynchronous-reply', 'ack')
+        })
 
         app.on('activate', () => {
             App.toggleWindow(true);
@@ -45,11 +49,18 @@ class App {
     static async createWindow () {
         const win = new BrowserWindow({
             icon: AppIcons.ON,
-            width: 800,
-            height: 600,
+            width: 500,
+            height: 500,
+            webPreferences: {
+                preload: `${__dirname}/frontend/preload.js`
+            },
         })
 
         return win.loadFile('src/index.html')
+    }
+
+    static getWindow() {
+        return BrowserWindow.getAllWindows()[0] || null
     }
 
     static createTray() {
@@ -106,7 +117,17 @@ class App {
         if (message.devId === env.TUYA_DEVICE_ID) {
             App.led = LEDStatus.fromJSON(message.status);
             App.updateTray();
+
+            const win = App.getWindow();
+
+            if (win) {
+                win.webContents.send('message', message)
+            }
         }
+    }
+
+    static async onFrontendMessage (message) {
+        App.api.setLEDColor(message.color);
     }
 }
 

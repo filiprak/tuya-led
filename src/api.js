@@ -172,6 +172,21 @@ class ApiClient {
 
         await this.switchLED(enable);
     }
+
+    async setLEDColor (hsv_color) {
+        return await this.call(
+            `/v1.0/devices/${this.device_id}/commands`,
+            'POST',
+            {
+                commands: [
+                    {
+                        code: 'colour_data',
+                        value: hsv_color,
+                    }
+                ],
+            }
+        )
+    }
 }
 
 module.exports = ApiClient;

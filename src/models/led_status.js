@@ -1,10 +1,12 @@
 class LEDCode {
     static SWITCH_LED = 'switch_led'
+    static COLOUR_DATA = 'colour_data'
 }
 
 class LEDStatus {
     loading = false
     switch_led = false
+    colour_data = {}
 
     constructor(params) {
         for (let key in params) {
@@ -18,6 +20,9 @@ class LEDStatus {
         json.forEach(param => {
             if (param.code === LEDCode.SWITCH_LED) {
                 params.switch_led = !!param.value;
+            }
+            if (param.code === LEDCode.COLOUR_DATA) {
+                params.colour_data = !!param.value;
             }
         });
 
