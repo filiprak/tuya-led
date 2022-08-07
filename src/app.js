@@ -18,7 +18,6 @@ class App {
         App.server.on('message', App.onServerMessage);
 
         process.on('exit', (code) => {
-            console.log('exit')
             App.server.kill('SIGINT')
         });
 
