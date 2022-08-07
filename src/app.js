@@ -1,8 +1,14 @@
 const { app, BrowserWindow, Tray, Menu, screen } = require('electron');
+const path = require('path');
 const env = require('../.env.json');
 const { fork } = require('child_process')
 const ApiClient = require('./api');
 const LEDStatus = require('./models/led_status');
+
+class AppIcons {
+    static ON = path.resolve(__dirname, '..', 'assets/icons/on.png')
+    static OFF = path.resolve(__dirname, '..', 'assets/icons/off.png')
+}
 
 class App {
     static api = new ApiClient();
@@ -38,7 +44,7 @@ class App {
 
     static async createWindow () {
         const win = new BrowserWindow({
-            icon: 'assets/icons/on.png',
+            icon: AppIcons.ON,
             width: 800,
             height: 600,
         })
@@ -79,7 +85,7 @@ class App {
     }
 
     static updateTray() {
-        App.tray.setImage(App.led.isEnabled() ? 'assets/icons/on.png' : 'assets/icons/off.png');
+        App.tray.setImage(App.led.isEnabled() ? AppIcons.ON : AppIcons.OFF);
     }
 
     static async toggleWindow (open) {
