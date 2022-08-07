@@ -53,7 +53,7 @@ class App {
     }
 
     static createTray() {
-        const tray = new Tray('assets/icons/off.png')
+        const tray = new Tray(AppIcons.OFF)
         const contextMenu = Menu.buildFromTemplate([
             {
                 label: 'Settings',
