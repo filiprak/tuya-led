@@ -1,6 +1,9 @@
 const { app, BrowserWindow, Tray, Menu, screen } = require('electron');
+const ApiClient = require('./api');
 
 class App {
+    static api = new ApiClient();
+
     static async setup () {
         await app.whenReady()
 
@@ -47,7 +50,9 @@ class App {
         tray.setContextMenu(contextMenu)
 
         tray.addListener('click', () => {
-            App.toggleWindow();
+            // App.toggleWindow();
+
+            App.api.switchLED(true);
         });
 
         return tray;

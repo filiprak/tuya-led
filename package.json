@@ -19,5 +19,10 @@
   "homepage": "https://github.com/filiprak/tuya-led#readme",
   "devDependencies": {
     "electron": "^20.0.1"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "crypto": "^1.0.1",
+    "qs": "^6.11.0"
   }
 }
