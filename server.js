@@ -10,7 +10,7 @@ const client = new TuyaWebsocket({
 })
 
 client.open(() => {
-  console.log('open');
+  console.log('Websocket server started');
 });
 
 client.message((ws, message) => {

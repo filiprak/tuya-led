@@ -42,6 +42,7 @@ class App {
 
         App.tray = App.createTray()
         App.led = await App.api.getLEDStatus()
+
         App.updateTray()
     }
 
@@ -53,6 +54,7 @@ class App {
             webPreferences: {
                 preload: `${__dirname}/frontend/preload.js`
             },
+            autoHideMenuBar: true,
         })
 
         return win.loadFile('src/index.html')
@@ -96,6 +98,7 @@ class App {
 
     static updateTray() {
         App.tray.setImage(App.led.isEnabled() ? AppIcons.ON : AppIcons.OFF);
+        App.tray.setToolTip(App.led.isEnabled() ? 'Tuya LED controller: On' : 'Tuya LED controller: Off');
     }
 
     static async toggleWindow (open) {
@@ -104,6 +107,9 @@ class App {
         if (open) {
             if (BrowserWindow.getAllWindows().length < 1) {
                 await App.createWindow()
+            }
+            if (App.getWindow()) {
+                App.getWindow().show()
             }
         } else {
             BrowserWindow
@@ -126,7 +132,26 @@ class App {
     }
 
     static async onFrontendMessage (message) {
-        App.api.setLEDColor(message.color);
+        if (message.type === 'request_state') {
+            const win = App.getWindow();
+
+            if (win) {
+                win.webContents.send('message', {
+                    status: [
+                        {
+                            code: 'colour_data',
+                            t: 0,
+                            value: App.led.getColourData()
+                        }
+                    ]
+                })
+            }
+        } else {
+            if (!App.led.isEnabled()) {
+                await App.api.switchLED(true)
+            }
+            await App.api.setLEDColor(message.color);
+        }
     }
 }
 

@@ -12,6 +12,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     send: (message) => {
         ipcRenderer.send('message', message)
     },
+    requestState: () => {
+        ipcRenderer.send('message', {
+            type: 'request_state'
+        })
+    },
     listen: (callback) => {
         listener = callback;
     },

@@ -21,10 +21,10 @@ class LEDStatus {
     merge(json) {
         json.forEach(param => {
             if (param.code === LEDCode.SWITCH_LED) {
-                this.switch_led = !!param.value;
+                this.switch_led = !!param.value
             }
             if (param.code === LEDCode.COLOUR_DATA) {
-                this.colour_data = param.value;
+                this.colour_data = param.value
             }
         });
 
@@ -37,6 +37,10 @@ class LEDStatus {
 
     setEnabled(enabled) {
         this.switch_led = !!enabled
+    }
+
+    getColourData() {
+        return this.colour_data
     }
 
     isLoading() {
