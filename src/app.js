@@ -26,9 +26,8 @@ class App {
             App.server.kill('SIGINT')
         });
 
-        ipcMain.on('asynchronous-message', (event, arg) => {
+        ipcMain.on('message', (event, arg) => {
             App.onFrontendMessage(arg);
-            event.reply('asynchronous-reply', 'ack')
         })
 
         app.on('activate', () => {

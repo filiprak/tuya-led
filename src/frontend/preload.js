@@ -2,19 +2,17 @@
 // process with the `contextBridge` API
 const { ipcRenderer, contextBridge } = require('electron')
 
-ipcRenderer.on('asynchronous-reply', (event, arg) => {
-    console.log(arg) // prints "pong" in the DevTools console
-})
+let listener = null;
 
 ipcRenderer.on('message', (event, arg) => {
-    console.log('message', arg) // prints "pong" in the DevTools console
+    listener && listener(arg);
 })
 
 contextBridge.exposeInMainWorld('electronAPI', {
     send: (message) => {
-        ipcRenderer.send('asynchronous-message', message)
+        ipcRenderer.send('message', message)
     },
-    listen: () => {
-
+    listen: (callback) => {
+        listener = callback;
     },
 })
