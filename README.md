@@ -1,7 +1,3 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
-<a name="readme-top"></a>
-
-<!-- PROJECT LOGO -->
 <br />
 <div align="center">
   <a href="https://github.com/filiprak/tuya-led">
@@ -31,6 +27,22 @@ Tuya Led is a nifty little tool crafted for controlling your LED light strips st
 
    ```sh
    npm install
+   ```
+
+3. Create `.env.json` file in the project root
+
+   ```json
+   {
+      "TUYA_CLIENT_ID": "<your-tuya-client-id>",
+      "TUYA_SECRET_KEY": "<your-tuya-secret-key>",
+      "TUYA_DEVICE_ID": "<your-tuya-device-id>"
+   }
+   ```
+
+3. Build application
+
+   ```sh
+   npm run make
    ```
 
 4. Enter your API in `config.js`
