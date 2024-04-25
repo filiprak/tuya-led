@@ -16,20 +16,19 @@ Tuya Led is a nifty little tool crafted for controlling your LED light strips st
 
 ### Installation
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+1. Clone the repo:
 
    ```sh
    git clone https://github.com/github_username/repo_name.git
    ```
 
-3. Install NPM packages
+2. Install NPM packages:
 
    ```sh
    npm install
    ```
 
-3. Create `.env.json` file in the project root
+3. Create `.env.json` file in the project root and put your credentials in it:
 
    ```json
    {
@@ -39,14 +38,10 @@ Tuya Led is a nifty little tool crafted for controlling your LED light strips st
    }
    ```
 
-3. Build application
+3. Build application:
 
    ```sh
    npm run make
    ```
 
-4. Enter your API in `config.js`
-
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
+4. Run application executable: `out/tuya-led-win32-x64/tuya-led.exe`, new icon should appear in taskbar.
