@@ -15,35 +15,40 @@ class App {
     static tray = null;
     static led = new LEDStatus();
     static server = null
+    static errors = []
 
     static async setup () {
-        await app.whenReady()
+        try {
+            await app.whenReady()
 
-        App.server = fork(`${__dirname}/../server.js`)
-        App.server.on('message', App.onServerMessage);
+            App.server = fork(`${__dirname}/../server.js`)
+            App.server.on('message', App.onServerMessage);
 
-        process.on('exit', (code) => {
-            App.server.kill('SIGINT')
-        });
+            process.on('exit', (code) => {
+                App.server.kill('SIGINT')
+            });
 
-        ipcMain.on('message', (event, arg) => {
-            App.onFrontendMessage(arg);
-        })
+            ipcMain.on('message', (event, arg) => {
+                App.onFrontendMessage(arg);
+            })
 
-        app.on('activate', () => {
-            App.toggleWindow(true);
-        })
+            app.on('activate', () => {
+                App.toggleWindow(true);
+            })
 
-        app.on('window-all-closed', () => {
-            try {
-                app.dock.hide()
-            } catch (e) {}
-        })
+            app.on('window-all-closed', () => {
+                try {
+                    app.dock.hide()
+                } catch (e) { }
+            })
 
-        App.tray = App.createTray()
-        App.led = await App.api.getLEDStatus()
+            App.tray = App.createTray()
+            App.led = await App.api.getLEDStatus()
 
-        App.updateTray()
+            App.updateTray()
+        } catch (e) {
+            App.onError(e);
+        }
     }
 
     static async createWindow () {
@@ -60,11 +65,11 @@ class App {
         return win.loadFile('src/index.html')
     }
 
-    static getWindow() {
+    static getWindow () {
         return BrowserWindow.getAllWindows()[0] || null
     }
 
-    static createTray() {
+    static createTray () {
         const tray = new Tray(AppIcons.OFF)
         const contextMenu = Menu.buildFromTemplate([
             {
@@ -96,7 +101,7 @@ class App {
         return tray;
     }
 
-    static updateTray() {
+    static updateTray () {
         App.tray.setImage(App.led.isEnabled() ? AppIcons.ON : AppIcons.OFF);
         App.tray.setToolTip(App.led.isEnabled() ? 'Tuya LED controller: On' : 'Tuya LED controller: Off');
     }
@@ -132,25 +137,49 @@ class App {
     }
 
     static async onFrontendMessage (message) {
-        if (message.type === 'request_state') {
-            const win = App.getWindow();
+        try {
+            if (message.type === 'request_state') {
+                const win = App.getWindow();
 
-            if (win) {
-                win.webContents.send('message', {
-                    status: [
-                        {
-                            code: 'colour_data',
-                            t: 0,
-                            value: App.led.getColourData()
-                        }
-                    ]
-                })
+                if (win) {
+                    win.webContents.send('message', {
+                        status: [
+                            {
+                                code: 'colour_data',
+                                t: 0,
+                                value: App.led.getColourData()
+                            }
+                        ]
+                    })
+                    win.webContents.send('message', {
+                        type: 'error',
+                        errors: App.errors,
+                    });
+                }
+            } else {
+                if (!App.led.isEnabled()) {
+                    await App.api.switchLED(true)
+                }
+                await App.api.setLEDColor(message.color);
             }
-        } else {
-            if (!App.led.isEnabled()) {
-                await App.api.switchLED(true)
-            }
-            await App.api.setLEDColor(message.color);
+        } catch (e) {
+            App.onError(e);
+        }
+    }
+
+    static async onError (error) {
+        if (App.errors.length > 3) {
+            App.errors = App.errors.slice(2);
+        }
+        App.errors.push(error);
+
+        const win = App.getWindow();
+
+        if (win) {
+            win.webContents.send('message', {
+                type: 'error',
+                errors: App.errors,
+            });
         }
     }
 }

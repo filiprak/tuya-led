@@ -10,6 +10,9 @@ new Vue({
     el: '#app',
     template: `
         <div class="wrapper">
+            <div class="errors">
+                <div v-for="error in errors">{{error}}</div>
+            </div>
             <form class="led-form">
                 <div id="picker"></div>
             </form>
@@ -23,6 +26,7 @@ new Vue({
                 v: 0,
             },
             last_t: -1,
+            errors: [],
         }
     },
     methods: {
@@ -50,29 +54,32 @@ new Vue({
             this._dbSendUpdate();
         },
         onServerMessage (message) {
-            console.log(message)
-            const code = message.status.filter(i => i.code === 'colour_data')[0];
+            if (message.type !== 'error') {
+                const code = message.status.filter(i => i.code === 'colour_data')[0];
 
-            if (code && code.t > this.last_t) {
-                const hsv = JSON.parse(code.value);
-                this._picker.setColor({
-                    h: (hsv.h).toFixed(0),
-                    s: (hsv.s / 2.55).toFixed(0),
-                    v: (hsv.v / 2.55).toFixed(0),
-                });
+                if (code && code.t > this.last_t) {
+                    const hsv = JSON.parse(code.value);
+                    this._picker.setColor({
+                        h: (hsv.h).toFixed(0),
+                        s: (hsv.s / 2.55).toFixed(0),
+                        v: (hsv.v / 2.55).toFixed(0),
+                    });
 
-                this.last_t = code.t;
+                    this.last_t = code.t;
+                }
+            } else {
+                this.errors = message.errors;
             }
         },
     },
     mounted () {
-        this._picker = window.p = new iro.ColorPicker('#picker', {
+        this._picker = new iro.ColorPicker('#picker', {
             borderWidth: 2
         })
         this._picker.on('input:end', this.onColorChange)
         this._picker.on('mount', () => {
-            electronAPI.listen(this.onServerMessage)
             electronAPI.requestState()
         });
+        electronAPI.listen(this.onServerMessage)
     },
 });
