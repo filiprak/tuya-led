@@ -92,7 +92,11 @@ class App {
             if (!App.led.isLoading()) {
                 App.led.setLoading(true)
 
-                await App.api.toggleLED();
+                try {
+                    await App.api.toggleLED();
+                } catch (e) {
+                    App.onError(e);
+                }
 
                 App.led.setLoading(false)
             }
@@ -168,8 +172,8 @@ class App {
     }
 
     static async onError (error) {
-        if (App.errors.length > 3) {
-            App.errors = App.errors.slice(2);
+        if (App.errors.length >= 2) {
+            App.errors.shift();
         }
         App.errors.push(error);
 
