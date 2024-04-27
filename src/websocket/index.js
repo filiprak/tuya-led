@@ -163,6 +163,7 @@ class TuyaMessageSubscribeWebsocket {
 
     subError(server) {
         server.on('error', (e) => {
+            this.logger('ERROR', e);
             this.event.emit(TuyaMessageSubscribeWebsocket.error, this.server, e);
         });
     }

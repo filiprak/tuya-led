@@ -143,7 +143,7 @@ class ApiClient {
 
     async getLEDStatus () {
         const { result } = await this.call(
-            `/v1.0/devices/${this.device_id}/status`,
+            `/v1.0/iot-03/devices/${this.device_id}/status`,
             'GET'
         )
 
@@ -152,7 +152,7 @@ class ApiClient {
 
     async switchLED (enable) {
         return await this.call(
-            `/v1.0/devices/${this.device_id}/commands`,
+            `/v1.0/iot-03/devices/${this.device_id}/commands`,
             'POST',
             {
                 commands: [
@@ -175,7 +175,7 @@ class ApiClient {
 
     async setLEDColor (hsv_color) {
         return await this.call(
-            `/v1.0/devices/${this.device_id}/commands`,
+            `/v1.0/iot-03/devices/${this.device_id}/commands`,
             'POST',
             {
                 commands: [
