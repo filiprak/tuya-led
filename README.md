@@ -16,14 +16,14 @@ Tuya Led is a nifty little tool crafted for controlling your LED light strips st
 
 ### Setup Tuya accounts
 
-1. Install Tuya Smart mobile app and sign up.
-2. Configure your LED Stripe to work with Tuya Smart mobile app (follow instructions that shows in app).
-3. Sign up to Tuya Cloud developer platform https://www.tuya.com/
-4. Developer platform: Go to `Cloud > Development > Create Cloud Project`, choose `Smart Home` development method.
-5. Developer platform: Copy your `Client ID` and `Client Secret`.
-6. Developer platform: Click `Open Project` and go to `Devices` tab, then `Link Tuya App Account` tab below, click `Add App Account`.
-7. Developer platform: Link your mobile Tuya app with the project.
-8. Developer platform: In project, go to `All Devices` tab and copy your device ID.
+1. Install **Tuya Smart** mobile app and sign up.
+2. Configure your LED Stripe to work with **Tuya Smart** mobile app (follow instructions that shows in app).
+3. Sign up to **Tuya Cloud Developer Platform** here https://www.tuya.com/
+4. **Developer Platform:** Go to `Cloud > Development > Create Cloud Project`, choose `Smart Home` development method.
+5. **Developer Platform:** Copy your `Client ID` and `Client Secret`.
+6. **Developer Platform:** Click `Open Project` and go to `Devices` tab, then `Link Tuya App Account` tab below, click `Add App Account`.
+7. **Developer Platform:** Link your mobile Tuya app with the project.
+8. **Developer Platform:** In project, go to `All Devices` tab and copy your device ID.
 
 ### Installation
 
