@@ -30,7 +30,7 @@ Tuya Led is a nifty little tool crafted for controlling your LED light strips st
 1. Clone the repo:
 
    ```sh
-   git clone https://github.com/github_username/repo_name.git
+   git clone https://github.com/filiprak/tuya-led.git
    ```
 
 2. Install NPM packages:
@@ -55,4 +55,4 @@ Tuya Led is a nifty little tool crafted for controlling your LED light strips st
    npm run make
    ```
 
-4. Run application executable: `out/tuya-led-win32-x64/tuya-led.exe`, new icon should appear in taskbar.
+4. Run application executable: `out/tuya-led-win32-x64/tuya-led.exe`, LED status icon should appear in your system taskbar.
